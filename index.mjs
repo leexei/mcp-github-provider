@@ -1,4 +1,5 @@
-// MCP GitHub Context Provider - Node.jsテンプレート
+// MCP GitHub Context Provider - Node.js (ESM対応)
+// ファイル名: index.mjs
 // 必要パッケージ: express, @octokit/rest, js-base64, dotenv
 
 import express from 'express';
@@ -40,11 +41,12 @@ app.get('/mcp/github/:owner/:repo', async (req, res) => {
 
     res.json(context);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch data from GitHub' });
+    console.error("GitHub APIエラー:", err);
+    res.status(500).json({ error: err.message || 'Unknown error' });
   }
 });
 
+// MCP Manifest のサンプル提供
 app.get('/mcp/github/:owner/:repo/manifest.json', (req, res) => {
   const { owner, repo } = req.params;
   const baseUrl = process.env.BASE_URL || `http://localhost:${port}`;
