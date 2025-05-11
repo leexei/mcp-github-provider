@@ -1,4 +1,4 @@
-// MCP GitHub Context Provider - Node.js (ESM対応) for leexei/lex-blog with code file injection
+// MCP GitHub Context Provider - Node.js (ESM対応) for leexei/lex-blog with code file injection (app/page.tsx)
 import express from 'express';
 import { Octokit } from '@octokit/rest';
 import { decode as base64decode } from 'js-base64';
@@ -22,7 +22,7 @@ app.get('/mcp/github/:owner/:repo', async (req, res) => {
     const [readmeRes, issuesRes, codeRes] = await Promise.all([
       octokit.repos.getReadme({ owner, repo }),
       octokit.issues.listForRepo({ owner, repo, state: 'open' }),
-      octokit.repos.getContent({ owner, repo, path: 'pages/index.tsx' })
+      octokit.repos.getContent({ owner, repo, path: 'app/page.tsx' })
     ]);
 
     const readme = base64decode(readmeRes.data.content);
@@ -32,7 +32,7 @@ app.get('/mcp/github/:owner/:repo', async (req, res) => {
       const codeText = base64decode(codeRes.data.content);
       codeEntry = {
         type: "code",
-        filename: "pages/index.tsx",
+        filename: "app/page.tsx",
         language: "typescript",
         content: codeText.slice(0, 2000) + (codeText.length > 2000 ? "\n// (truncated)" : "")
       };
