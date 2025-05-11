@@ -1,7 +1,4 @@
-// MCP GitHub Context Provider - Node.js (ESM対応)
-// ファイル名: index.mjs
-// 必要パッケージ: express, @octokit/rest, js-base64, dotenv
-
+// MCP GitHub Context Provider - Node.js (ESM対応) for leexei/lex-blog
 import express from 'express';
 import { Octokit } from '@octokit/rest';
 import { decode as base64decode } from 'js-base64';
@@ -15,6 +12,11 @@ const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 // MCP形式でGitHubリポジトリのREADMEとIssueを提供
 app.get('/mcp/github/:owner/:repo', async (req, res) => {
   const { owner, repo } = req.params;
+
+  // 対象リポジトリを leexei/lex-blog に限定
+  if (owner !== 'leexei' || repo !== 'lex-blog') {
+    return res.status(403).json({ error: 'Unauthorized repository access' });
+  }
 
   try {
     const [readmeRes, issuesRes] = await Promise.all([
@@ -46,21 +48,26 @@ app.get('/mcp/github/:owner/:repo', async (req, res) => {
   }
 });
 
-// MCP Manifest のサンプル提供
+// MCP Manifest のサンプル提供（leexei/lex-blog専用）
 app.get('/mcp/github/:owner/:repo/manifest.json', (req, res) => {
   const { owner, repo } = req.params;
   const baseUrl = process.env.BASE_URL || `http://localhost:${port}`;
 
+  // 対象リポジトリを leexei/lex-blog に限定
+  if (owner !== 'leexei' || repo !== 'lex-blog') {
+    return res.status(403).json({ error: 'Unauthorized repository access' });
+  }
+
   res.json({
     "@context": "https://openai.com/mcp/context-manifest",
-    name: "GitHub MCP Provider",
-    description: `Provides README and issues for ${owner}/${repo}`,
+    name: "Private Repo Context Provider",
+    description: `Provides context for leexei/lex-blog`,
     version: "1.0",
     entries: [
       {
-        uri: `mcp://github.com/${owner}/${repo}`,
+        uri: `mcp://github.com/leexei/lex-blog`,
         type: "github-repo",
-        context_url: `${baseUrl}/mcp/github/${owner}/${repo}`
+        context_url: `${baseUrl}/mcp/github/leexei/lex-blog`
       }
     ]
   });
